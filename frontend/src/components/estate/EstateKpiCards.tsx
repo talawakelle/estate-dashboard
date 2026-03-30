@@ -16,6 +16,12 @@ function isCopKpi(kpi: Kpi) {
   return key === "cop" || label === "cop";
 }
 
+function isNsaKpi(kpi: Kpi) {
+  const key = kpi.key.trim().toLowerCase();
+  const label = kpi.label.trim().toLowerCase();
+  return key === "nsa" || label === "nsa";
+}
+
 function getAchieved(kpi: Kpi) {
   if (typeof kpi.achieved === "number") {
     return kpi.achieved;
@@ -73,6 +79,7 @@ export function EstateKpiCards({ kpis }: Props) {
         const actualValueClass = getActualValueClass(kpi, achieved);
         const varianceValueClass = getVarianceValueClass(kpi, varianceValue);
         const achievedClass = getAchievedClass(achieved);
+        const showGsaForThisCard = isNsaKpi(kpi);
 
         return (
           <Card key={kpi.key} className="relative overflow-hidden">
@@ -80,7 +87,7 @@ export function EstateKpiCards({ kpis }: Props) {
               {kpi.label}
             </div>
 
-            <div className="mt-3 grid grid-cols-2 gap-4 border-b border-dashboard-border pb-3 xl:grid-cols-4">
+            <div className="mt-3 grid grid-cols-3 gap-4 border-b border-dashboard-border pb-3">
               <div>
                 <div className="text-xs text-dashboard-muted">Budget</div>
                 <div className="mt-1 text-base font-semibold text-dashboard-text">
@@ -101,29 +108,42 @@ export function EstateKpiCards({ kpis }: Props) {
                   {formatNumber(varianceValue)}
                 </div>
               </div>
-
-              <div>
-                <div className="text-xs text-dashboard-muted">% Achieved</div>
-                <div className={`mt-1 text-base font-semibold ${achievedClass}`}>
-                  {typeof achieved === "number" ? formatAchieved(achieved) : "-"}
-                </div>
-              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-3">
-              <div>
-                <div className="text-xs text-dashboard-muted">GSA</div>
-                <div className="mt-1 text-sm font-bold leading-none text-dashboard-heading">
-                  {typeof kpi.gsa === "number" ? formatNumber(kpi.gsa) : "-"}
-                </div>
-              </div>
+            <div className="pt-3">
+              {showGsaForThisCard ? (
+                <div className="grid grid-cols-3 gap-4 items-start">
+                  <div>
+                    <div className="text-xs text-dashboard-muted">GSA</div>
+                    <div className="mt-1 text-sm font-bold leading-none text-dashboard-heading">
+                      {typeof kpi.gsa === "number" ? formatNumber(kpi.gsa) : "-"}
+                    </div>
+                  </div>
 
-              <div>
-                <div className="text-xs text-dashboard-muted">Rank</div>
-                <div className="mt-1 text-sm font-bold leading-none text-dashboard-heading">
-                  {typeof kpi.rank === "number" ? kpi.rank : "-"}
+                  <div className="text-center">
+                    <div className="text-xs text-dashboard-muted">% Achieved</div>
+                    <div className={`mt-1 text-base font-semibold ${achievedClass}`}>
+                      {typeof achieved === "number" ? formatAchieved(achieved) : "-"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-dashboard-muted">Rank</div>
+                    <div className="mt-1 text-sm font-bold leading-none text-dashboard-heading">
+                      {typeof kpi.rank === "number" ? kpi.rank : "-"}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex justify-center">
+                  <div className="text-center">
+                    <div className="text-xs text-dashboard-muted">% Achieved</div>
+                    <div className={`mt-1 text-base font-semibold ${achievedClass}`}>
+                      {typeof achieved === "number" ? formatAchieved(achieved) : "-"}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
         );
