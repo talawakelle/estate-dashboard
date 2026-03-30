@@ -95,7 +95,13 @@ export function UploadPanel({ filename, onUpload }: Props) {
   }, [currentMonthFile, filename]);
 
   return (
-    <div className="space-y-3 rounded-xl border-2 border-dashboard-accent bg-dashboard-panelSoft p-3">
+    <div
+      className={
+        showFiveFileUpload
+          ? "space-y-3 rounded-xl border-2 border-dashboard-accent bg-dashboard-panelSoft p-3"
+          : ""
+      }
+    >
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
