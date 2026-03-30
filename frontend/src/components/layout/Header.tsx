@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Toggle } from "../common/Toggle";
 import { UploadPanel } from "../upload/UploadPanel";
 import { Button } from "../common/Button";
@@ -39,8 +38,6 @@ export function Header({
   query = "",
   onQueryChange
 }: Props) {
-  const [showUploadPanel, setShowUploadPanel] = useState(false);
-
   const showEstateActions = mode === "month" && !!selectedEstateKey;
   const hideHeaderText = !!selectedEstateKey;
 
@@ -67,18 +64,8 @@ export function Header({
               </p>
             </div>
 
-            <div className="xl:shrink-0 space-y-2">
-              <button
-                type="button"
-                onClick={() => setShowUploadPanel((prev) => !prev)}
-                className="rounded-xl border border-dashboard-accent bg-white px-3 py-2 text-sm font-medium text-dashboard-heading transition-colors hover:bg-dashboard-panelSoft"
-              >
-                {showUploadPanel ? "Hide 5-file upload" : "Show 5-file upload"}
-              </button>
-
-              {showUploadPanel ? (
-                <UploadPanel filename={filename} onUpload={onUpload} />
-              ) : null}
+            <div className="xl:shrink-0">
+              <UploadPanel filename={filename} onUpload={onUpload} />
             </div>
           </div>
 
