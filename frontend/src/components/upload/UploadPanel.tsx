@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, FileText, FolderClock, History, TrendingUp, Upload } from "lucide-react";
 import { UploadStatus } from "./UploadStatus";
 import { Button } from "../common/Button";
@@ -79,6 +79,13 @@ export function UploadPanel({ filename, onUpload }: Props) {
   const [previousMonthFile, setPreviousMonthFile] = useState<File | null>(null);
   const [gsaCurrentFile, setGsaCurrentFile] = useState<File | null>(null);
   const [gsaPreviousFile, setGsaPreviousFile] = useState<File | null>(null);
+  const [showFiveFileUpload, setShowFiveFileUpload] = useState(false);
+
+  useEffect(() => {
+    if (currentMonthFile || currentYearFile || previousMonthFile || gsaCurrentFile || gsaPreviousFile) {
+      setShowFiveFileUpload(true);
+    }
+  }, [currentMonthFile, currentYearFile, previousMonthFile, gsaCurrentFile, gsaPreviousFile]);
 
   const monthLabel = useMemo(() => {
     if (currentMonthFile) {
@@ -90,71 +97,84 @@ export function UploadPanel({ filename, onUpload }: Props) {
   return (
     <div className="space-y-3 rounded-xl border-2 border-dashboard-accent bg-dashboard-panelSoft p-3">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2 rounded-xl border border-dashboard-accent bg-white px-3 py-2 text-sm font-medium text-dashboard-heading">
+        <button
+          type="button"
+          onClick={() => setShowFiveFileUpload((prev) => !prev)}
+          className="flex items-center gap-2 rounded-xl border border-dashboard-accent bg-white px-3 py-2 text-sm font-medium text-dashboard-heading transition-colors hover:bg-dashboard-panelSoft"
+        >
           <CalendarDays className="h-4 w-4" />
           <span>{monthLabel}</span>
           <span className="rounded-full bg-dashboard-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
             5-file upload
           </span>
+          <span className="text-xs text-dashboard-muted">
+            {showFiveFileUpload ? "Hide" : "Show"}
+          </span>
+        </button>
+
+        {showFiveFileUpload ? (
+          <>
+            <Button
+              onClick={() =>
+                currentMonthFile &&
+                onUpload(
+                  currentMonthFile,
+                  currentYearFile,
+                  previousMonthFile,
+                  gsaCurrentFile,
+                  gsaPreviousFile,
+                )
+              }
+              disabled={!currentMonthFile}
+            >
+              <Upload className="mr-2 inline h-4 w-4" />
+              Load
+            </Button>
+
+            <UploadStatus filename={filename} monthLabel={monthLabel} />
+          </>
+        ) : null}
+      </div>
+
+      {showFiveFileUpload ? (
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+          <UploadSlot
+            label="1. Current Month Analysis"
+            icon={<FileText className="h-4 w-4" />}
+            file={currentMonthFile}
+            onPick={() => currentMonthInputRef.current?.click()}
+            required
+          />
+
+          <UploadSlot
+            label="2. Current Year Workbook"
+            icon={<History className="h-4 w-4" />}
+            file={currentYearFile}
+            onPick={() => currentYearInputRef.current?.click()}
+          />
+
+          <UploadSlot
+            label="3. Previous Year Month Analysis"
+            icon={<FolderClock className="h-4 w-4" />}
+            file={previousMonthFile}
+            onPick={() => previousMonthInputRef.current?.click()}
+          />
+
+          <UploadSlot
+            label="4. GSA Current Year"
+            icon={<TrendingUp className="h-4 w-4" />}
+            file={gsaCurrentFile}
+            onPick={() => gsaCurrentInputRef.current?.click()}
+          />
+
+          <UploadSlot
+            label="5. GSA Previous Year"
+            icon={<TrendingUp className="h-4 w-4" />}
+            file={gsaPreviousFile}
+            onPick={() => gsaPreviousInputRef.current?.click()}
+          />
         </div>
-
-        <Button
-          onClick={() =>
-            currentMonthFile &&
-            onUpload(
-              currentMonthFile,
-              currentYearFile,
-              previousMonthFile,
-              gsaCurrentFile,
-              gsaPreviousFile,
-            )
-          }
-          disabled={!currentMonthFile}
-        >
-          <Upload className="mr-2 inline h-4 w-4" />
-          Load
-        </Button>
-
-        <UploadStatus filename={filename} monthLabel={monthLabel} />
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-        <UploadSlot
-          label="1. Current Month Analysis"
-          icon={<FileText className="h-4 w-4" />}
-          file={currentMonthFile}
-          onPick={() => currentMonthInputRef.current?.click()}
-          required
-        />
-
-        <UploadSlot
-          label="2. Current Year Workbook"
-          icon={<History className="h-4 w-4" />}
-          file={currentYearFile}
-          onPick={() => currentYearInputRef.current?.click()}
-        />
-
-        <UploadSlot
-          label="3. Previous Year Month Analysis"
-          icon={<FolderClock className="h-4 w-4" />}
-          file={previousMonthFile}
-          onPick={() => previousMonthInputRef.current?.click()}
-        />
-
-        <UploadSlot
-          label="4. GSA Current Year"
-          icon={<TrendingUp className="h-4 w-4" />}
-          file={gsaCurrentFile}
-          onPick={() => gsaCurrentInputRef.current?.click()}
-        />
-
-        <UploadSlot
-          label="5. GSA Previous Year"
-          icon={<TrendingUp className="h-4 w-4" />}
-          file={gsaPreviousFile}
-          onPick={() => gsaPreviousInputRef.current?.click()}
-        />
-      </div>
+      ) : null}
 
       <input
         ref={currentMonthInputRef}
