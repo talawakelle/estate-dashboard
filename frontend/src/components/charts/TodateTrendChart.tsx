@@ -25,6 +25,40 @@ function getHistoryFields(kpiKey: string) {
   return { budgetField: "profit_budget", actualField: "profit_actual" };
 }
 
+
+function formatMonthLabel(month: string) {
+  const normalized = String(month ?? "").trim().toLowerCase();
+
+  const monthMap: Record<string, string> = {
+    january: "Jan",
+    jan: "Jan",
+    february: "Feb",
+    feb: "Feb",
+    march: "Mar",
+    mar: "Mar",
+    april: "Apr",
+    apr: "Apr",
+    may: "May",
+    june: "Jun",
+    jun: "Jun",
+    july: "Jul",
+    jul: "Jul",
+    august: "Aug",
+    aug: "Aug",
+    september: "Sep",
+    sep: "Sep",
+    sept: "Sep",
+    october: "Oct",
+    oct: "Oct",
+    november: "Nov",
+    nov: "Nov",
+    december: "Dec",
+    dec: "Dec"
+  };
+
+  return monthMap[normalized] ?? month;
+}
+
 export function TodateTrendChart({ history, kpiKey }: Props) {
   const { budgetField, actualField } = getHistoryFields(kpiKey);
 
@@ -53,7 +87,7 @@ export function TodateTrendChart({ history, kpiKey }: Props) {
     },
     xAxis: {
       type: "category",
-      data: history.map((item) => item.month),
+      data: history.map((item) => formatMonthLabel(item.month)),
       axisLine: {
         lineStyle: { color: "#cbd5e1" }
       },
